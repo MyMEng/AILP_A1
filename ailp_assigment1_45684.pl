@@ -85,7 +85,6 @@ q6_move(Position, PosList, RewPath, D, L) :-
 	q6_new_pos(Position, M, NewPosition),
 
 	% update radius?
-	%% radius_updates(PosList, L, L1),
 	% when all positions from current radius are in the step-on list!
 	findall(Ps, outer(L, Ps), RadiusList),
 	% each element of RadiusList belongs to PosList
@@ -94,7 +93,8 @@ q6_move(Position, PosList, RewPath, D, L) :-
 	outer(L1, NewPosition),
 
 	% force to persist?
-	% need to figure out!!!
+	% only needed when changing radius
+	
 
 	\+ memberchk(NewPosition, PosList),
 	ailp_show_move(Position, NewPosition),
@@ -108,26 +108,6 @@ check_radius_updates([RLa|RL], PosList, L, L1) :-
 	check_radius_updates(RL, PosList, L, L1),
 	true.
 check_radius_updates([A|_], _, L, L).
-
-radius_updates(List, L, L1) :-
-	ailp_grid_size(S),
-	fields_to_visit_at_level_l(S, L, 0, Vi),
-	sup(List, Vi, L, L1).
-
-sup(List, N, L, L) :-
-	not( length(List, N) ).
-sup(List, N, L, L1) :-
-	length(List, N),
-	L1 is L+1.
-
-fields_to_visit_at_level_l(S, 0, Acc, Vi) :-
-	Vi is 4*S -4+Acc.
-fields_to_visit_at_level_l(S, L, Acc, Vi) :-
-	CurLev is 4*(S-(L*2)) -4+Acc,
-	L1 is L-1,
-	L>0,
-	fields_to_visit_at_level_l(S, L1, CurLev, Vi),
-	true.
 
 % can I use this?
 q6_complete(L) :- 
