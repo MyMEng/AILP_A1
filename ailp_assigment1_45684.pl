@@ -1,4 +1,4 @@
-candidate_number(45684).
+candidate_number(45685).
 
 %     Part A: Querying prolog
 
@@ -117,7 +117,8 @@ q6_move(Position, PosList, RewPath, D, L) :-
 	q6_new_pos(Position, M, NewPosition),
 	%% q6_outermost(NewPosition, PosList, D).
 	% outermost circles DO
-	outer(L, NewPosition),
+	radius_updates(PosList, L, L1),
+	outer(L1, NewPosition),
 
 	% update radius?
 	% when all positions from current radius are in the step-on list!
@@ -125,7 +126,6 @@ q6_move(Position, PosList, RewPath, D, L) :-
 	%% findall(Ps, outer(L, Ps), RadiusList),
 	% each element of RadiusList belongs to PosList
 	%% check_radius_updates(RadiusList, PosList, L, L1),
-	radius_updates(PosList, L, L1),
 
 	% force to persist?
 	% need to figure out!!!
@@ -163,9 +163,9 @@ sup(List, N, L, L1) :-
 fields_to_visit_at_level_l(S, 0, Acc, Vi) :-
 	Vi is 4*S -4+Acc.
 fields_to_visit_at_level_l(S, L, Acc, Vi) :-
-	CurLev is 4*(S-L) -4+Acc,
+	CurLev is 4*(S-(L*2)) -4+Acc,
 	L1 is L-1,
-	L1>0,
+	L>0,
 	fields_to_visit_at_level_l(S, L1, CurLev, Vi),
 	true.
 
