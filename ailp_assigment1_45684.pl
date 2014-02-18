@@ -1,4 +1,4 @@
-candidate_number(45685).
+candidate_number(45684).
 
 %     Part A: Querying prolog
 
@@ -21,7 +21,7 @@ q3([s,e,w,n]).
 q4a([p(1, 2), p(1, 3), p(1, 4), p(2, 4), p(3, 4), p(4, 4), p(4, 3), p(3, 3), p(2, 3), p(2, 2), p(3, 2), p(4, 2), p(4, 1), p(3, 1), p(2, 1), p(1, 1)]).
 
 % ';'
-q4b([p(1, 2), p(1, 3), p(1, 4), p(2, 4), p(3, 4), p(4, 4), p(4, 3), p(4, 2), p(4, 1), p(3, 1), p(3, 2), p(3, 3), p(2, 3), p(2, 2), p(2, 1), p(1, 1)]).
+q4b([p(1, 2), p(1, 3), p(1, 4), p(2, 4), p(3, 4), p(4, 4), p(4, 3), p(3, 3), p(2, 3), p(2, 2), p(3, 2), p(3, 1), p(4, 1), p(4,2)]).
 
 % same as q4a
 q4c([p(1, 2), p(1, 3), p(1, 4), p(2, 4), p(3, 4), p(4, 4), p(4, 3), p(3, 3), p(2, 3), p(2, 2), p(3, 2), p(4, 2), p(4, 1), p(3, 1), p(2, 1), p(1, 1)]).
@@ -38,41 +38,28 @@ q5_corner_move :-
 	ailp_show_move(p(1,1),p(4,1)),
 	ailp_show_move(p(4,1),p(1,4)),
 	ailp_show_move(p(1,4),p(4,4)),
-	% ??
 	assignment1_module:ailp_show_complete.
-	%% do_command([mower, colour, 1, 1, lighter]),
-	%% do_command([mower, move, 1, 1], _Result),
-	%% do_command([mower, move, 4, 1], _Result),
-	%% do_command([mower, move, 1, 4], _Result),
-	%% do_command([mower, move, 4, 4], _Result).
-	% reset?
-	%% reset,
-	%% ailp_start_position(p(1,1)),
-	%% ailp_show_move(p(1,1),p(4,1)),
-	%% ailp_show_move(p(4,1),p(1,4)),
-	%% ailp_show_move(p(1,4),p(4,4)),
-	% show complete?
-	%% ailp_show_complete.
+
 
 
 % q5_corner_move2/0
 q5_corner_move2 :-
 	ailp_start_position(p(SX,SY)), % get start position
 	ailp_grid_size(Size), % get size of board
-	% ???
 	% if start point is one of corners --- ignore
 	ailp_show_move(p(SX,SY),p(1,1)), % move from start to top left corner
 	ailp_show_move(p(1,1),p(Size,1)), % move from start to top right corner
 	ailp_show_move(p(Size,1),p(1,Size)), % move from start to bottom left corner
 	ailp_show_move(p(1,Size),p(Size,Size)), % move from start to top left corner
-	% ??
 	assignment1_module:ailp_show_complete.
+
+%     Q6
 
 % q6_spiral/1
 q6_spiral(Path) :-
 	ailp_start_position(p(SX, SY)), % get start position
 	ailp_grid_size(Size), % get size of board
-	q6_initiate(p(SX, SY), p(NX, NY), Size), 	% check where you are and move to the border if necessary
+	q6_initiate(p(SX, SY), p(NX, NY), Size), % check where you are and move to the border if necessary
 	q6_move(p(NX, NY), Path),
 	true.
 
@@ -85,24 +72,8 @@ q6_initiate(p(SX, SY), p(NX, NY), N) :-
 	; otherwise -> NX is 1, NY is 1
 	).
 
-% decide on direction
-%% q6_direction(p(SX, SY), D) :-
-%% 	ailp_grid_size(Size), % get size of board
-%% 	( SX = 1, SY = 2              -> D = cw
-%% 	; SX = 1, SY is Size-1        -> D = acw
-%% 	; SX = Size, SY = 2           -> D = acw
-%% 	; SX = Size, SY is Size-1     -> D = cw
-%% 	; SX = 2, SY = 1              -> D = acw
-%% 	; SX is Size-1, SY = 1        -> D = cw
-%% 	; SX = 2, SY is Size-1        -> D = acw
-%% 	; SX is Size-1, SY is Size-1  -> D = cw
-%% 	; otherwise                   -> D = cw
-%% 	).
-
 % move agent
 q6_move(Position, Path) :-
-	%% q6_direction(Position, D), % decide on direction
-	%% ailp_grid_size(D), % get outermost radius
 	q6_d(D), % choose direction to follow
 	q6_move(Position, [Position], RewPath, D, 0),
 	reverse(RewPath, Path).
@@ -110,36 +81,23 @@ q6_move(Position, Path) :-
 q6_move(_, Path, Path, _, _) :-
 	q6_complete(Path).
 q6_move(Position, PosList, RewPath, D, L) :-
-	%% q6_findmove(Position, NewPosition, D), % execute move
-
-	% outermost circles DO
 	q6_m(M),
 	q6_new_pos(Position, M, NewPosition),
-	%% q6_outermost(NewPosition, PosList, D).
-	% outermost circles DO
+	% update radius?
 	radius_updates(PosList, L, L1),
 	outer(L1, NewPosition),
 
-	% update radius?
 	% when all positions from current radius are in the step-on list!
-	% allof outer(L, PossiblePossitions) is in PosList
-	%% findall(Ps, outer(L, Ps), RadiusList),
+	% findall(Ps, outer(L, Ps), RadiusList),
 	% each element of RadiusList belongs to PosList
-	%% check_radius_updates(RadiusList, PosList, L, L1),
+	% check_radius_updates(RadiusList, PosList, L, L1),
 
 	% force to persist?
 	% need to figure out!!!
-
-
 	\+ memberchk(NewPosition, PosList),
 	ailp_show_move(Position, NewPosition),
 	q6_move(NewPosition, [NewPosition|PosList], RewPath, D, L1),
 	true.
-
-%% q6_findmove(Position, NewPosition, cw) :-
-%% 	true.
-%% q6_findmove(Position, NewPosition, acw) :-
-%% 	true.
 
 %% check_radius_updates([], _, L, L1) :-
 %% 	L1 is L+1.
@@ -148,7 +106,6 @@ q6_move(Position, PosList, RewPath, D, L) :-
 %% 	check_radius_updates(RL, PosList, L, L1),
 %% 	true.
 %% check_radius_updates([A|_], _, L, L).
-%%%%%
 radius_updates(List, L, L1) :-
 	ailp_grid_size(S),
 	fields_to_visit_at_level_l(S, L, 0, Vi),
@@ -188,8 +145,6 @@ fields_to_visit_at_level_l(S, L, Acc, Vi) :-
 %% 	radius_updates(List, N1, L, LF),
 %% 	true.
 
-
-
 % can I use this?
 q6_complete(L) :- 
 	ailp_grid_size(N),
@@ -197,7 +152,6 @@ q6_complete(L) :-
 	length(L,N2),
 	ailp_show_complete.
 
-% outermost circles DO
 q6_new_pos(p(X,Y), M, p(X1,Y1)) :-
 	( M = s -> X1 =  X,    Y1 is Y+1
 	; M = n -> X1 =  X,    Y1 is Y-1
@@ -208,17 +162,6 @@ q6_new_pos(p(X,Y), M, p(X1,Y1)) :-
 	ailp_grid_size(N),
 	X1 =< N, Y1 =< N. 
 
-%% q6_outermost(p(OX, OY), PosList, p(NX, NY)) :-
-%% 	( D = cw  -> X1 =  X,    Y1 is Y+1
-%% 	; D = acw -> X1 =  X,    Y1 is Y-1
-%% 	; D = e -> X1 is X+1,  Y1 =  Y
-%% 	; D = w -> X1 is X-1,  Y1 =  Y
-%% 	),
-%% 	X1 >= 1, Y1 >=1,
-%% 	ailp_grid_size(N),
-%% 	X1 =< N, Y1 =< N,
-%% 	true.
-
 q6_m(n).
 q6_m(e).
 q6_m(s).
@@ -226,12 +169,6 @@ q6_m(w).
 
 q6_d(cw).
 q6_d(acw).
-% outermost circles DO
-
-
-
-
-%% findall(C, outer(Outerness, C), L)
 
 outer(Level, C) :-
 	ailp_grid_size(N),
@@ -241,16 +178,8 @@ outer(Level, C) :-
 		((X is 1+Level; X is N-Level), give_range(B, H, Y));
 		((Y is 1+Level; Y is N-Level), give_range(B, H, X))
 	),
-	%% findall(A, give_range(N, A), Ly),
-	%% memberchk(Y, Ly),
-	%% Y >= 1, Nc is N+0, Y =< Nc,
-	%% Y is N-Level,
 	C = p(X, Y),
 	true.
-
-%% give_range(N, A) :-
-%% 	give_range(1, N, A),
-%% 	true.
 
 give_range(L, _, L).
 give_range(L, U, A) :-
