@@ -94,12 +94,27 @@ q6_move(Position, PosList, RewPath, D, L) :-
 
 	% force to persist?
 	% only needed when changing radius
-	
+	ensure_direction(D, M, Position),
 
 	\+ memberchk(NewPosition, PosList),
 	ailp_show_move(Position, NewPosition),
 	q6_move(NewPosition, [NewPosition|PosList], RewPath, D, L1),
 	true.
+
+% q6_initiate agent to outer position
+ensure_direction(D, M, p(X, Y)) :-
+	ailp_grid_size(S), % get size of board
+	S1 is S/2,
+	( D = cw,  M = s, X < S1  -> \+ q6_new_pos(p(X, Y), n, NP) % in CW prefer N i.e. if N is legit don't move
+	; D = cw,  M = n, X > S1  -> \+ q6_new_pos(p(X, Y), s, NP)
+	; D = cw,  M = w, Y < S1  -> \+ q6_new_pos(p(X, Y), e, NP) % etc.
+	; D = cw,  M = e, Y > S1  -> \+ q6_new_pos(p(X, Y), w, NP)
+	; D = acw, M = n, X < S1  -> \+ q6_new_pos(p(X, Y), s, NP)
+	; D = acw, M = s, X > S1  -> \+ q6_new_pos(p(X, Y), n, NP)
+	; D = acw, M = e, Y < S1  -> \+ q6_new_pos(p(X, Y), w, NP)
+	; D = acw, M = w, Y > S1  -> \+ q6_new_pos(p(X, Y), e, NP)
+	; otherwise -> true
+	).
 
 check_radius_updates([], _, L, L1) :-
 	L1 is L+1.
