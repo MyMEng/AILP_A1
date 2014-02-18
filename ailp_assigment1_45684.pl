@@ -118,6 +118,18 @@ q6_move(Position, PosList, RewPath, D, L) :-
 	%% q6_outermost(NewPosition, PosList, D).
 	% outermost circles DO
 	outer(L, NewPosition),
+
+	% update radius?
+	% when all positions from current radius are in the step-on list!
+	% allof outer(L, PossiblePossitions) is in PosList
+	findall(Ps, outer(L, Ps), RadiusList),
+	% each element of RadiusList belongs to PosList
+	% checkradiusupdaet(RadiusList, PosList, L, L1),
+
+	% force to persist?
+	% need to figure out!!!
+
+
 	\+ memberchk(NewPosition, PosList),
 	ailp_show_move(Position, NewPosition),
 	q6_move(NewPosition, [NewPosition|PosList], RewPath, D, L),
