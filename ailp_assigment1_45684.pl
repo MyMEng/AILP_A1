@@ -83,6 +83,13 @@ q6_move(_, Path, Path, _, _) :-
 q6_move(Position, PosList, RewPath, D, L) :-
 	q6_m(M),
 	q6_new_pos(Position, M, NewPosition),
+	\+ memberchk(NewPosition, PosList),
+
+
+	% force to persist?
+	% only needed when changing radius
+	% CUT, CUT, CUT, CUT, CUT
+	ensure_direction(D, M, Position),
 
 	% update radius?
 	% when all positions from current radius are in the step-on list!
@@ -92,12 +99,10 @@ q6_move(Position, PosList, RewPath, D, L) :-
 
 	outer(L1, NewPosition),
 
-	% force to persist?
-	% only needed when changing radius
-	ensure_direction(D, M, Position),
 
-	\+ memberchk(NewPosition, PosList),
 	ailp_show_move(Position, NewPosition),
+	%% term_to_atom([NewPosition|PosList],PsA),
+	%% do_command([mower,console,PsA],_R),
 	q6_move(NewPosition, [NewPosition|PosList], RewPath, D, L1),
 	true.
 
