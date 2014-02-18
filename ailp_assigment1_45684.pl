@@ -124,7 +124,7 @@ q6_move(Position, PosList, RewPath, D, L) :-
 	% allof outer(L, PossiblePossitions) is in PosList
 	findall(Ps, outer(L, Ps), RadiusList),
 	% each element of RadiusList belongs to PosList
-	% checkradiusupdaet(RadiusList, PosList, L, L1),
+	check_radius_updates(RadiusList, PosList, L, L1),
 
 	% force to persist?
 	% need to figure out!!!
@@ -132,13 +132,23 @@ q6_move(Position, PosList, RewPath, D, L) :-
 
 	\+ memberchk(NewPosition, PosList),
 	ailp_show_move(Position, NewPosition),
-	q6_move(NewPosition, [NewPosition|PosList], RewPath, D, L),
+	q6_move(NewPosition, [NewPosition|PosList], RewPath, D, L1),
 	true.
 
 %% q6_findmove(Position, NewPosition, cw) :-
 %% 	true.
 %% q6_findmove(Position, NewPosition, acw) :-
 %% 	true.
+
+check_radius_updates([], _, L, L1) :-
+	L1 is L+1.
+check_radius_updates([RLa|RL], PosList, L, L1) :-
+	memberchk(RLa, PosList),
+	check_radius_updates(RL, PosList, L, L1),
+	true.
+check_radius_updates([A|_], _, L, L).
+
+
 
 % can I use this?
 q6_complete(L) :- 
@@ -170,9 +180,9 @@ q6_new_pos(p(X,Y), M, p(X1,Y1)) :-
 %% 	true.
 
 q6_m(n).
+q6_m(e).
 q6_m(s).
 q6_m(w).
-q6_m(e).
 
 q6_d(cw).
 q6_d(acw).
