@@ -104,29 +104,29 @@ q6_move(Position, Path) :-
 	%% q6_direction(Position, D), % decide on direction
 	%% ailp_grid_size(D), % get outermost radius
 	q6_d(D), % choose direction to follow
-	q6_move(Position, [Position], RewPath, D),
+	q6_move(Position, [Position], RewPath, D, 0),
 	reverse(RewPath, Path).
 
-q6_move(_, Path, Path, _) :-
+q6_move(_, Path, Path, _, _) :-
 	q6_complete(Path).
-q6_move(Position, PosList, RewPath, D) :-
+q6_move(Position, PosList, RewPath, D, L) :-
 	%% q6_findmove(Position, NewPosition, D), % execute move
 
 	% outermost circles DO
-	q6_m(M).
-	q6_new_pos(Position, M, NewPosition).
-	q6_outermost(NewPosition, PosList, D).
+	q6_m(M),
+	q6_new_pos(Position, M, NewPosition),
+	%% q6_outermost(NewPosition, PosList, D).
 	% outermost circles DO
-
+	outer(L, NewPosition),
 	\+ memberchk(NewPosition, PosList),
 	ailp_show_move(Position, NewPosition),
-	q6_move(NewPosition, [NewPosition|PosList], RewPath, D),
+	q6_move(NewPosition, [NewPosition|PosList], RewPath, D, L),
 	true.
 
-q6_findmove(Position, NewPosition, cw) :-
-	true.
-q6_findmove(Position, NewPosition, acw) :-
-	true.
+%% q6_findmove(Position, NewPosition, cw) :-
+%% 	true.
+%% q6_findmove(Position, NewPosition, acw) :-
+%% 	true.
 
 % can I use this?
 q6_complete(L) :- 
@@ -146,16 +146,16 @@ q6_new_pos(p(X,Y), M, p(X1,Y1)) :-
 	ailp_grid_size(N),
 	X1 =< N, Y1 =< N. 
 
-q6_outermost(p(OX, OY), PosList, p(NX, NY)) :-
-	( D = cw  -> X1 =  X,    Y1 is Y+1
-	; D = acw -> X1 =  X,    Y1 is Y-1
-	; D = e -> X1 is X+1,  Y1 =  Y
-	; D = w -> X1 is X-1,  Y1 =  Y
-	),
-	X1 >= 1, Y1 >=1,
-	ailp_grid_size(N),
-	X1 =< N, Y1 =< N,
-	true.
+%% q6_outermost(p(OX, OY), PosList, p(NX, NY)) :-
+%% 	( D = cw  -> X1 =  X,    Y1 is Y+1
+%% 	; D = acw -> X1 =  X,    Y1 is Y-1
+%% 	; D = e -> X1 is X+1,  Y1 =  Y
+%% 	; D = w -> X1 is X-1,  Y1 =  Y
+%% 	),
+%% 	X1 >= 1, Y1 >=1,
+%% 	ailp_grid_size(N),
+%% 	X1 =< N, Y1 =< N,
+%% 	true.
 
 q6_m(n).
 q6_m(s).
@@ -174,7 +174,7 @@ q6_d(acw).
 outer(Level, C) :-
 	ailp_grid_size(N),
 	B is 1+Level,
-	H is N-Level
+	H is N-Level,
 	(
 		((X is 1+Level; X is N-Level), give_range(B, H, Y));
 		((Y is 1+Level; Y is N-Level), give_range(B, H, X))
@@ -186,9 +186,9 @@ outer(Level, C) :-
 	C = p(X, Y),
 	true.
 
-give_range(N, A) :-
-	give_range(1, N, A),
-	true.
+%% give_range(N, A) :-
+%% 	give_range(1, N, A),
+%% 	true.
 
 give_range(L, _, L).
 give_range(L, U, A) :-
