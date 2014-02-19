@@ -81,23 +81,29 @@ q6_move(Position, Path) :-
 q6_move(_, Path, Path, _, _) :-
 	q6_complete(Path).
 q6_move(Position, PosList, RewPath, D, L) :-
+	LN is L+1,
+	ailp_grid_size(S),
+	SN is S/2,
+	LN =< SN,
+
 	q6_m(M),
 	q6_new_pos(Position, M, NewPosition),
 	\+ memberchk(NewPosition, PosList),
 
+	% update radius?
+	% when all positions from current radius are in the step-on list!
+	%% findall(Ps, outer_q(L, Ps), RadiusList),
+	% each element of RadiusList belongs to PosList
+	%% check_radius_updates(RadiusList, PosList, L, L1),
+
+	radius_updates(PosList, L, L1),
+
+	outer(L1, NewPosition),
 
 	% force to persist?
 	% only needed when changing radius
 	% CUT, CUT, CUT, CUT, CUT
-	ensure_direction(D, M, Position),
-
-	% update radius?
-	% when all positions from current radius are in the step-on list!
-	findall(Ps, outer(L, Ps), RadiusList),
-	% each element of RadiusList belongs to PosList
-	check_radius_updates(RadiusList, PosList, L, L1),
-
-	outer(L1, NewPosition),
+	ensure_direction(D, M, Position, PosList),
 
 
 	ailp_show_move(Position, NewPosition),
@@ -107,17 +113,42 @@ q6_move(Position, PosList, RewPath, D, L) :-
 	true.
 
 % q6_initiate agent to outer position
-ensure_direction(D, M, p(X, Y)) :-
+ensure_direction(D, M, p(X, Y), PosList) :-
 	ailp_grid_size(S), % get size of board
 	S1 is S/2,
-	( D = cw,  M = s, X < S1  -> \+ q6_new_pos(p(X, Y), n, NP) % in CW prefer N i.e. if N is legit don't move
-	; D = cw,  M = n, X > S1  -> \+ q6_new_pos(p(X, Y), s, NP)
-	; D = cw,  M = w, Y < S1  -> \+ q6_new_pos(p(X, Y), e, NP) % etc.
-	; D = cw,  M = e, Y > S1  -> \+ q6_new_pos(p(X, Y), w, NP)
-	; D = acw, M = n, X < S1  -> \+ q6_new_pos(p(X, Y), s, NP)
-	; D = acw, M = s, X > S1  -> \+ q6_new_pos(p(X, Y), n, NP)
-	; D = acw, M = e, Y < S1  -> \+ q6_new_pos(p(X, Y), w, NP)
-	; D = acw, M = w, Y > S1  -> \+ q6_new_pos(p(X, Y), e, NP)
+	( D = cw,  M = s, X =< S1  -> \+ (
+							  (q6_new_pos(p(X, Y), n, NP), \+ memberchk(NP, PosList))
+							; (q6_new_pos(p(X, Y), e, NP), \+ memberchk(NP, PosList))%c
+							)
+	% in CW prefer N i.e. if N is legit don't move
+	; D = cw,  M = n, X >= S1  -> \+ (
+							   (q6_new_pos(p(X, Y), s, NP), \+ memberchk(NP, PosList))
+							 ; (q6_new_pos(p(X, Y), w, NP), \+ memberchk(NP, PosList))%c
+							 )
+	; D = cw,  M = w, Y =< S1  -> \+ (
+							   (q6_new_pos(p(X, Y), e, NP), \+ memberchk(NP, PosList)) % etc.
+							;  (q6_new_pos(p(X, Y), s, NP), \+ memberchk(NP, PosList))%c
+							)
+	; D = cw,  M = e, Y >= S1  -> \+ (
+							  (q6_new_pos(p(X, Y), w, NP), \+ memberchk(NP, PosList))
+							; (q6_new_pos(p(X, Y), n, NP), \+ memberchk(NP, PosList))%c
+							)
+	; D = acw, M = n, X =< S1  -> \+ (
+							  (q6_new_pos(p(X, Y), s, NP), \+ memberchk(NP, PosList))
+							; (q6_new_pos(p(X, Y), e, NP), \+ memberchk(NP, PosList))%c
+							)
+	; D = acw, M = s, X >= S1  -> \+ (
+							  (q6_new_pos(p(X, Y), n, NP), \+ memberchk(NP, PosList))
+							; (q6_new_pos(p(X, Y), w, NP), \+ memberchk(NP, PosList))%c
+							)
+	; D = acw, M = e, Y =< S1  -> \+ (
+							  (q6_new_pos(p(X, Y), w, NP), \+ memberchk(NP, PosList))
+							; (q6_new_pos(p(X, Y), s, NP), \+ memberchk(NP, PosList))%c
+							)
+	; D = acw, M = w, Y >= S1  -> \+ (
+							  (q6_new_pos(p(X, Y), e, NP), \+ memberchk(NP, PosList))
+							; (q6_new_pos(p(X, Y), n, NP), \+ memberchk(NP, PosList))%c
+							)
 	; otherwise -> true
 	).
 
@@ -128,6 +159,13 @@ check_radius_updates([RLa|RL], PosList, L, L1) :-
 	check_radius_updates(RL, PosList, L, L1),
 	true.
 check_radius_updates([A|_], _, L, L).
+
+radius_updates(PosList, L, L1) :-
+	(
+	  length(PosList, 20) -> L1 is L+1
+	; length(PosList, 32) -> L1 is L+1
+	; otherwise           -> L1 = L
+	).
 
 % can I use this?
 q6_complete(L) :- 
@@ -154,7 +192,24 @@ q6_m(w).
 q6_d(cw).
 q6_d(acw).
 
-outer(Level, C) :-
+%% for testing only | no querying
+outer(Level, p(X,Y)) :-
+	ailp_grid_size(N),
+	B is 1+Level,
+	H is N-Level,
+	(
+		((Y = B; Y = H), is_in_range(B, H, X), !);
+		((X = B; X = H), is_in_range(B, H, Y))
+	),
+	true.
+is_in_range(L, U, N) :-
+	N =< U,
+	N >= L.
+
+
+
+
+outer_q(Level, p(X,Y)) :-
 	ailp_grid_size(N),
 	B is 1+Level,
 	H is N-Level,
@@ -162,9 +217,7 @@ outer(Level, C) :-
 		((X is 1+Level; X is N-Level), give_range(B, H, Y));
 		((Y is 1+Level; Y is N-Level), give_range(B, H, X))
 	),
-	C = p(X, Y),
 	true.
-
 give_range(L, _, L).
 give_range(L, U, A) :-
 	L < U,
