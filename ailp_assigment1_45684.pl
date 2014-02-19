@@ -92,10 +92,7 @@ q6_move(Position, PosList, RewPath, D, L) :-
 
 	% update radius?
 	% when all positions from current radius are in the step-on list!
-	%% findall(Ps, outer_q(L, Ps), RadiusList),
 	% each element of RadiusList belongs to PosList
-	%% check_radius_updates(RadiusList, PosList, L, L1),
-
 	radius_updates(PosList, L, L1),
 
 	outer(L1, NewPosition),
@@ -152,20 +149,33 @@ ensure_direction(D, M, p(X, Y), PosList) :-
 	; otherwise -> true
 	).
 
-check_radius_updates([], _, L, L1) :-
-	L1 is L+1.
-check_radius_updates([RLa|RL], PosList, L, L1) :-
-	memberchk(RLa, PosList),
-	check_radius_updates(RL, PosList, L, L1),
-	true.
-check_radius_updates([A|_], _, L, L).
 
-radius_updates(PosList, L, L1) :-
-	(
-	  length(PosList, 20) -> L1 is L+1
-	; length(PosList, 32) -> L1 is L+1
-	; otherwise           -> L1 = L
-	).
+
+
+radius_updates(List, L, L1) :-
+	ailp_grid_size(S),
+	fields_to_visit_at_level_l(S, L, 0, Vi),
+	sup(List, Vi, L, L1).
+
+sup(List, N, L, L) :-
+	not( length(List, N) ).
+sup(List, N, L, L1) :-
+	length(List, N),
+	L1 is L+1.
+
+fields_to_visit_at_level_l(S, 0, Acc, Vi) :-
+	Vi is 4*S -4+Acc.
+fields_to_visit_at_level_l(S, L, Acc, Vi) :-
+	CurLev is 4*(S-(L*2)) -4+Acc,
+	L1 is L-1,
+	L>0,
+	fields_to_visit_at_level_l(S, L1, CurLev, Vi),
+	true.
+
+
+
+
+
 
 % can I use this?
 q6_complete(L) :- 
@@ -205,22 +215,3 @@ outer(Level, p(X,Y)) :-
 is_in_range(L, U, N) :-
 	N =< U,
 	N >= L.
-
-
-
-
-outer_q(Level, p(X,Y)) :-
-	ailp_grid_size(N),
-	B is 1+Level,
-	H is N-Level,
-	(
-		((X is 1+Level; X is N-Level), give_range(B, H, Y));
-		((Y is 1+Level; Y is N-Level), give_range(B, H, X))
-	),
-	true.
-give_range(L, _, L).
-give_range(L, U, A) :-
-	L < U,
-	L1 is L+1,
-	give_range(L1, U, A),
-	true.
