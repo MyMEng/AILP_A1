@@ -34,24 +34,87 @@ q4d([p(1, 2), p(1, 3), p(1, 4), p(2, 4), p(3, 4), p(4, 4), p(4, 3), p(4, 2), p(4
 % q5a | q5_corner_move/0
 q5_corner_move :-
 	ailp_start_position(p(A,B)),
+	(\+ ((A = 1, B = 1); (A = 1, B = 4); (A = 4, B = 1); (A = 4, B = 4))),
 	ailp_show_move(p(A,B),p(1,1)),
 	ailp_show_move(p(1,1),p(4,1)),
 	ailp_show_move(p(4,1),p(1,4)),
 	ailp_show_move(p(1,4),p(4,4)),
 	assignment1_module:ailp_show_complete.
 
+%%%%%%%%%%%%%???
+q5_corner_move :-
+	ailp_start_position(p(1,1)),
+	ailp_show_move(p(1,1),p(4,1)),
+	ailp_show_move(p(4,1),p(1,4)),
+	ailp_show_move(p(1,4),p(4,4)),
+	assignment1_module:ailp_show_complete.
+q5_corner_move :-
+	ailp_start_position(p(1,4)),
+	ailp_show_move(p(1,4),p(1,1)),
+	ailp_show_move(p(1,1),p(4,1)),
+	ailp_show_move(p(4,1),p(4,4)),
+	assignment1_module:ailp_show_complete.
+q5_corner_move :-
+	ailp_start_position(p(4,1)),
+	ailp_show_move(p(4,1),p(1,1)),
+	ailp_show_move(p(1,1),p(1,4)),
+	ailp_show_move(p(1,4),p(4,4)),
+	assignment1_module:ailp_show_complete.
+q5_corner_move :-
+	ailp_start_position(p(4,4)),
+	ailp_show_move(p(4,4),p(4,1)),
+	ailp_show_move(p(4,1),p(1,1)),
+	ailp_show_move(p(1,1),p(1,4)),
+	assignment1_module:ailp_show_complete.
+%%%%%%%%%%%%%???
 
 
 % q5_corner_move2/0
 q5_corner_move2 :-
-	ailp_start_position(p(SX,SY)), % get start position
+	ailp_start_position(p(A,B)), % get start position
 	ailp_grid_size(Size), % get size of board
+	(\+( (A = 1, B = 1); (A = 1, B = Size); (A = Size, B = 1); (A = Size, B = Size))),
 	% if start point is one of corners --- ignore
-	ailp_show_move(p(SX,SY),p(1,1)), % move from start to top left corner
+	ailp_show_move(p(A,B),p(1,1)), % move from start to top left corner
 	ailp_show_move(p(1,1),p(Size,1)), % move from start to top right corner
 	ailp_show_move(p(Size,1),p(1,Size)), % move from start to bottom left corner
 	ailp_show_move(p(1,Size),p(Size,Size)), % move from start to top left corner
 	assignment1_module:ailp_show_complete.
+
+%%%%%%%%%%%%%%?????
+q5_corner_move2 :-
+	ailp_start_position(p(1,1)), % get start position
+	ailp_grid_size(Size), % get size of board
+	% if start point is one of corners --- ignore
+	ailp_show_move(p(1,1),p(Size,1)), % move from start to top right corner
+	ailp_show_move(p(Size,1),p(1,Size)), % move from start to bottom left corner
+	ailp_show_move(p(1,Size),p(Size,Size)), % move from start to top left corner
+	assignment1_module:ailp_show_complete.
+q5_corner_move2 :-
+	ailp_grid_size(Size), % get size of board
+	ailp_start_position(p(1,Size)), % get start position
+	% if start point is one of corners --- ignore
+	ailp_show_move(p(1,Size),p(1,1)), % move from start to top right corner
+	ailp_show_move(p(1,1),p(Size,1)), % move from start to bottom left corner
+	ailp_show_move(p(Size,1),p(Size,Size)), % move from start to top left corner
+	assignment1_module:ailp_show_complete.
+q5_corner_move2 :-
+	ailp_grid_size(Size), % get size of board
+	ailp_start_position(p(Size,1)), % get start position
+	% if start point is one of corners --- ignore
+	ailp_show_move(p(Size,1),p(1,1)), % move from start to top right corner
+	ailp_show_move(p(1,1),p(1, Size)), % move from start to bottom left corner
+	ailp_show_move(p(1,Size),p(Size,Size)), % move from start to top left corner
+	assignment1_module:ailp_show_complete.
+q5_corner_move2 :-
+	ailp_grid_size(Size), % get size of board
+	ailp_start_position(p(Size,Size)), % get start position
+	% if start point is one of corners --- ignore
+	ailp_show_move(p(Size,Size),p(1,Size)), % move from start to top right corner
+	ailp_show_move(p(1,Size),p(1,1)), % move from start to bottom left corner
+	ailp_show_move(p(1,1),p(Size,1)), % move from start to top left corner
+	assignment1_module:ailp_show_complete.
+%%%%%%%%%%%%%%?????
 
 %     Q6
 
